@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: url_shortener
+      POSTGRES_PASSWORD: url_shortener
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./initdb/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+  management-service:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: ["java", "-cp", "build/classes", "urlshortener.bootstrap.ManagementMain"]
+    environment:
+      APP_MODE: distributed-container
+      APP_MANAGEMENT_PORT: 8080
+      APP_BASE_URL: https://localhost
+      APP_DB_HOST: postgres
+      APP_DB_PORT: 5432
+      APP_DB_NAME: url_shortener
+      APP_DB_USER: url_shortener
+      APP_DB_PASSWORD: url_shortener
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_REDIS_CACHE_DB: 0
+      APP_REDIS_QUEUE_DB: 1
+    depends_on:
+      - postgres
+      - redis
+
+  redirect-service:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: ["java", "-cp", "build/classes", "urlshortener.bootstrap.RedirectMain"]
+    environment:
+      APP_MODE: distributed-container
+      APP_REDIRECT_PORT: 8081
+      APP_BASE_URL: https://localhost
+      APP_DB_HOST: postgres
+      APP_DB_PORT: 5432
+      APP_DB_NAME: url_shortener
+      APP_DB_USER: url_shortener
+      APP_DB_PASSWORD: url_shortener
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_REDIS_CACHE_DB: 0
+      APP_REDIS_QUEUE_DB: 1
+    depends_on:
+      - postgres
+      - redis
+
+  background-worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: ["java", "-cp", "build/classes", "urlshortener.bootstrap.WorkerMain"]
+    environment:
+      APP_MODE: distributed-container
+      APP_BASE_URL: https://localhost
+      APP_DB_HOST: postgres
+      APP_DB_PORT: 5432
+      APP_DB_NAME: url_shortener
+      APP_DB_USER: url_shortener
+      APP_DB_PASSWORD: url_shortener
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_REDIS_CACHE_DB: 0
+      APP_REDIS_QUEUE_DB: 1
+    depends_on:
+      - postgres
+      - redis
+
+  reverse-proxy:
+    image: nginx:1.27-alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx-full.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - management-service
+      - redirect-service
+
+volumes:
+  postgres-data:
+  redis-data:
