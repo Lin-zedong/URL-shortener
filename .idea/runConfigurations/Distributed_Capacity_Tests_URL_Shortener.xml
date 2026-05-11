@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Распределённые capacity-сценарии URL Shortener" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="urlshortener.loadtest.RunDistributedCapacityTestsInIdea" />
+    <module name="URL_Shortener" />
+    <envs>
+      <env name="APP_MODE" value="distributed-idea" />
+      <env name="APP_BASE_URL" value="https://localhost" />
+      <env name="APP_DB_HOST" value="localhost" />
+      <env name="APP_DB_PORT" value="15432" />
+      <env name="APP_DB_NAME" value="url_shortener" />
+      <env name="APP_DB_USER" value="url_shortener" />
+      <env name="APP_DB_PASSWORD" value="url_shortener" />
+      <env name="APP_REDIS_HOST" value="localhost" />
+      <env name="APP_REDIS_PORT" value="6379" />
+      <env name="APP_REDIS_CACHE_DB" value="0" />
+      <env name="APP_REDIS_QUEUE_DB" value="1" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

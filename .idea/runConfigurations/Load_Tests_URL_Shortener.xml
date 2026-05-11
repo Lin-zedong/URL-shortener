@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Нагрузочное тестирование URL Shortener" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="urlshortener.loadtest.RunLoadTests" />
+    <module name="URL_Shortener" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
