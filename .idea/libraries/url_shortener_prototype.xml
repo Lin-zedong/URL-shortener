@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="url-shortener-prototype">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/out/url-shortener-prototype.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
